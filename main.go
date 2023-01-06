@@ -13,6 +13,7 @@ func main() {
 	e := echo.New()
 
 	e.GET("/", hello)
+	e.Logger.Print("test")
 	e.Logger.Fatal(e.Start(":3000"))
 }
 

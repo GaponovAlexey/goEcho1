@@ -70,9 +70,10 @@ func main() {
 		if err := v.Struct(reqBody); err != nil {
 			return err
 		}
-		product := map[int]string{
-			len(products) + 1: reqBody.Name,
-		}
+		// product := map[int]string{
+			// len(products) + 1: reqBody.Name,
+		// }
+
 	})
 	//end
 	e.Logger.Fatal(e.Start(port))

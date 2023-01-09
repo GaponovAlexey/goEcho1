@@ -1,7 +1,7 @@
 package main
 
 import (
-	h "net/http"
+	"net/http"
 	"strconv"
 
 	"github.com/go-playground/validator/v10"
@@ -9,142 +9,119 @@ import (
 
 )
 
-var (
-	products = []map[int]string{{1: "mobiles"}, {2: "tv"}, {3: "laptop"}}
-	v        = validator.New()
-	e        = echo.New()
-)
-
-type ProdVal struct {
-	val *validator.Validate
+type Valid struct {
+	Valid *validator.Validate
+}
+type req struct {
+	// Name string `json:"name" validate:"required,min=4"`
+	Name string `json:"name"`
 }
 
-func (p *ProdVal) Validate(i interface{}) error {
-	return p.val.Struct(i)
+var (
+	mas    = []map[int]string{{1: "2"}, {2: "two"}, {3: "three"}}
+	e      = echo.New()
+	vNew   = validator.New()
+	body   = req{}
+	newMas = map[int]string{}
+)
+
+func (p *Valid) Validate(i interface{}) error {
+	return p.Valid.Struct(i)
 }
 
 func main() {
-	//func
-	e.GET("/p", func(c echo.Context) error {
-		return c.JSON(h.StatusOK, products)
-	})
-	//getId -- id
-	e.GET("/p/:id", getId)
-	//POST
-	e.POST("/p", addProd)
-	e.PUT("/p/:id", putProd)
-	e.DELETE("/p/:id", delProd)
 
+	//start
+	e.GET("/", func(c echo.Context) error {
+		return c.JSON(http.StatusOK, mas)
+	})
+	e.GET("/:id", getId)
+	e.POST("/", postMas)
+	e.PUT("/:id", putMas)
+	e.DELETE("/:id", delMas)
 	//end
 	e.Logger.Fatal(e.Start(":3000"))
 }
 
+func cancel(e error) {
+	if e != nil {
+		panic(e)
+	}
+}
+
 // func
-func getId(c echo.Context) error {
-	pID, err := strconv.Atoi(c.Param("id"))
-
-	if err != nil {
-		return err
-	}
-
-	var newProduct map[int]string
-
-	for _, v := range products {
-		for k := range v {
-			if pID == k {
-				newProduct = v
-			}
-		}
-	}
-	if newProduct == nil {
-		return c.JSON(h.StatusNotFound, "not found product id")
-	}
-	return c.JSON(h.StatusOK, newProduct)
-}
-
-func addProd(c echo.Context) error {
-	type body struct {
-		Name string `json:"product_name" validate:"required,min=4"`
-	}
-	var reqBody body
-
-	e.Validator = &ProdVal{val: v}
-
-	if err := c.Bind(&reqBody); err != nil {
-		return err
-	}
-	if err := c.Validate(reqBody); err != nil {
-		return err
-	}
-	product := map[int]string{
-		len(products) + 1: reqBody.Name,
-	}
-	products = append(products, product)
-	return c.JSON(h.StatusOK, product)
-}
-
-func putProd(c echo.Context) error {
-	pID, err := strconv.Atoi(c.Param("id"))
-	var prod map[int]string
-
-	if err != nil {
-		return err
-	}
-	for _, p := range products {
-		for k := range p {
-			if pID == k {
-				prod = p
-			}
-		}
-	}
-
-	if prod == nil {
-		return c.JSON(h.StatusNotFound, "not data")
-	}
-
-	type req struct {
-		Name string `json:"product_name" validate:"required,min=4"`
-	}
-
-	var body req
-
-	e.Validator = &ProdVal{val: v}
+func putMas(c echo.Context) error {
+	pId, err := strconv.Atoi(c.Param("id"))
+	cancel(err)
 
 	if err := c.Bind(&body); err != nil {
 		return err
 	}
-	if err := c.Validate(body); err != nil {
-		return err
+	for _, v := range mas {
+		for k := range v {
+			if k == pId {
+				newMas = v
+			}
+		}
 	}
-
-	prod[pID] = body.Name
-	return c.JSON(h.StatusOK, prod)
+	newMas[pId] = body.Name
+	return c.JSON(http.StatusOK, newMas)
 }
 
-func delProd(c echo.Context) error {
-	var prod map[int]string
-	var index int
+func delMas(c echo.Context) error {
 	pID, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		return err
-	}
-
-	for i, p := range products {
-		for k := range p {
-			if pID == k {
-				prod = p
+	cancel(err)
+	var index int
+	for i, v := range mas {
+		for k := range v {
+			if k == pID {
+				newMas = v
 				index = i
 			}
 		}
 	}
+	if newMas == nil {
+		return c.JSON(http.StatusNotFound, "not found")
+	}
+	splice := func(s []map[int]string, i int) []map[int]string {
+		return append(s[:i], s[i+1:]...)
+	}
+	mas = splice(mas, index)
+	return c.JSON(http.StatusOK, newMas)
+}
+
+func getId(c echo.Context) error {
+	var prod map[int]string
+	gId, err := strconv.Atoi(c.Param("id"))
+	cancel(err)
+	for _, v := range mas {
+		for k := range v {
+			if k == gId {
+				prod = v
+			}
+		}
+	}
+
 	if prod == nil {
-		return c.JSON(h.StatusNotFound, "not Found")
+		return c.JSON(http.StatusOK, "not found")
 	}
-	splice := func(s []map[int]string, index int) []map[int]string {
-		return append(s[:index], s[index+1:]...)
+	return c.JSON(http.StatusOK, prod)
+}
+
+func postMas(c echo.Context) error {
+	// e.Validator = &Valid{Valid: vNew}
+
+	if err := c.Bind(&body); err != nil {
+		return err
 	}
-	
-	products = splice(products, index)
-	
-	return c.JSON(h.StatusOK, prod)
+
+	// if err := c.Validate(body); err != nil {
+	// 	return err
+	// }
+
+	prod := map[int]string{
+		len(mas) + 1: body.Name,
+	}
+	mas = append(mas, prod)
+	return c.JSON(http.StatusOK, prod)
 }

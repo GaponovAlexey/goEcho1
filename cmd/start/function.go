@@ -1,6 +1,7 @@
 package start
 
 import (
+	"fmt"
 	h "net/http"
 	"strconv"
 
@@ -21,7 +22,10 @@ func cancel(e error) {
 
 func getID(c echo.Context) error {
 	gId, err := strconv.Atoi(c.Param("id"))
-	cancel(err)
+	if err != nil {
+		return fmt.Errorf("Err ->>>>", err)
+	}
+	// cancel(err);;;;;;;;;;;;;;;;;;;;;;;;
 	oneObject := map[int]string{}
 	for _, v := range object {
 		for k := range v {

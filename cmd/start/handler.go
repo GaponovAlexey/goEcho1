@@ -1,20 +1,12 @@
 package start
 
 import (
-	"go/echo/config"
 	h "net/http"
 
-	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/labstack/echo/v4"
 
 )
 
-func init() {
-	err := cleanenv.ReadEnv(&config.Cfg)
-	
-	cancel(err)
-
-}
 
 func Start() {
 	//start

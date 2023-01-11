@@ -16,16 +16,16 @@ var (
 
 func cancel(e error) {
 	if e != nil {
-		panic(e)
+		fmt.Errorf("Error ->", e)
 	}
 }
 
 func getID(c echo.Context) error {
 	gId, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		return fmt.Errorf("Err ->>>>", err)
-	}
-	// cancel(err);;;;;;;;;;;;;;;;;;;;;;;;
+	// if err != nil {
+	// return fmt.Errorf("Err ->>>>", err)
+	// }
+	cancel(err)
 	oneObject := map[int]string{}
 	for _, v := range object {
 		for k := range v {
@@ -86,10 +86,10 @@ func putObject(c echo.Context) error {
 
 func delObject(c echo.Context) error {
 	// var delOb map[int]string
-	var index int
 	pID, err := strconv.Atoi(c.Param("id"))
 	cancel(err)
-
+	
+	var index int
 	for i, v := range object {
 		for k := range v {
 			if pID == k {

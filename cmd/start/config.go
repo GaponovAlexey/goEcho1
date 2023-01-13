@@ -22,7 +22,10 @@ var cfg = &ConfigDatabase{
 
 func init() {
 	err := godotenv.Load()
-	cancel(err)
+	if err != nil {
+		panic(err)
+	}
+
 	log.Println("PORT -> ", cfg.Port)
 	log.Println("PORT2 -> ", os.Getenv("PORT"))
 }

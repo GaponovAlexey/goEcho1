@@ -9,11 +9,17 @@ import (
 
 )
 
-func serverMessage(next echo.HandlerFunc) echo.HandlerFunc {
+// func serverMessage(next echo.HandlerFunc) echo.HandlerFunc {
+// 	return func(c echo.Context) error {
+// 		log.Println("server MESSAGE")
+// 		return next(c)
+// 	}
+// }
+
+func serMes(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		log.Println("server MESSAGE")
-		// c.Request().URL.Path = "/api/1"
-		// fmt.Printf("%+v\n", c.Request())
+		log.Println("you")
+
 		return next(c)
 	}
 }
@@ -21,14 +27,14 @@ func serverMessage(next echo.HandlerFunc) echo.HandlerFunc {
 func Start() {
 	//start
 	e.Pre(middleware.RemoveTrailingSlash())
+
 	e.GET("/api", func(c echo.Context) error {
-		// fmt.Printf("inside = %+v\n", c.Request())
 		return c.JSON(h.StatusOK, object)
 	})
-	e.GET("/api/:id", getID)
+	e.GET("/api/:id", getID, serMes)
 	e.POST("/api", addObject)
 	e.PUT("/api/:id", putObject)
-	e.DELETE("/api/:id", delObject, middleware.BodyLimit("1"))
+	e.DELETE("/api/:id", delObject)
 	//end
 	e.Logger.Fatal(e.Start(":3000"))
 

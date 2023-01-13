@@ -1,7 +1,6 @@
 package start
 
 import (
-	"fmt"
 	h "net/http"
 	"strconv"
 
@@ -14,31 +13,22 @@ var (
 	e      = echo.New()
 )
 
-func cancel(e error) {
-	if e != nil {
-		fmt.Errorf("Error ->", e)
-	}
-}
 
+// two
 func getID(c echo.Context) error {
-	gId, err := strconv.Atoi(c.Param("id"))
-	// if err != nil {
-	// return fmt.Errorf("Err ->>>>", err)
-	// }
-	cancel(err)
-	oneObject := map[int]string{}
+	gId, _ := strconv.Atoi(c.Param("id"))
+	var getIdObject map[int]string
 	for _, v := range object {
 		for k := range v {
-			if k == gId {
-				oneObject = v
+			if gId == k {
+				getIdObject = v
 			}
 		}
 	}
-	if oneObject == nil {
-		return c.JSON(h.StatusNotFound, "not found")
-	}
-
-	return c.JSON(h.StatusOK, oneObject)
+	// if getIdObject == nil {
+	// 	return c.JSON(h.StatusNotFound, "not found")
+	// }
+	return c.JSON(h.StatusOK, getIdObject)
 }
 
 func addObject(c echo.Context) error {
@@ -50,21 +40,23 @@ func addObject(c echo.Context) error {
 	if err := c.Bind(&body); err != nil {
 		return err
 	}
-	newObj := map[int]string{
+
+	newObject := map[int]string{
 		len(object) + 1: body.Name,
 	}
-	object = append(object, newObj)
-	return c.JSON(h.StatusOK, newObj)
+
+	object = append(object, newObject)
+
+	return c.JSON(h.StatusOK, body)
 }
 
 func putObject(c echo.Context) error {
-	pId, err := strconv.Atoi(c.Param("id"))
-	cancel(err)
-	var newOb map[int]string
+	gID, _ := strconv.Atoi(c.Param("id"))
+	var newObject map[int]string
 	for _, v := range object {
 		for k := range v {
-			if pId == k {
-				newOb = v
+			if gID == k {
+				newObject = v
 			}
 		}
 	}
@@ -72,38 +64,38 @@ func putObject(c echo.Context) error {
 	type res struct {
 		Name string `json:"name"`
 	}
-
 	var body res
 
 	if err := c.Bind(&body); err != nil {
 		return err
 	}
 
-	newOb[pId] = body.Name
-	return c.JSON(h.StatusOK, newOb)
+	newObject[gID] = body.Name
 
+	return c.JSON(h.StatusOK, newObject)
 }
 
 func delObject(c echo.Context) error {
-	// var delOb map[int]string
-	pID, err := strconv.Atoi(c.Param("id"))
-	cancel(err)
-	
+	gId, _ := strconv.Atoi(c.Param("id"))
+
 	var index int
 	for i, v := range object {
 		for k := range v {
-			if pID == k {
-				// delOb = v
+			if gId == k {
 				index = i
 			}
 		}
 	}
 
-	splice := func(s []map[int]string, i int) []map[int]string {
+	split := func(s []map[int]string, i int) []map[int]string {
 		return append(s[:i], s[i+1:]...)
 	}
 
-	object = splice(object, index)
-	return c.JSON(h.StatusOK, "success delete")
+	
+
+	object = split(object, index)
+	
+
+	return c.JSON(h.StatusOK, "success")
 
 }

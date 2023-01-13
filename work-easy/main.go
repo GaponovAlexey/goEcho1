@@ -141,6 +141,7 @@ func delProd(c echo.Context) error {
 	if prod == nil {
 		return c.JSON(h.StatusNotFound, "not Found")
 	}
+	
 	splice := func(s []map[int]string, index int) []map[int]string {
 		return append(s[:index], s[index+1:]...)
 	}

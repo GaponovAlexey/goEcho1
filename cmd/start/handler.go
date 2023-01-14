@@ -9,12 +9,6 @@ import (
 
 )
 
-// func serverMessage(next echo.HandlerFunc) echo.HandlerFunc {
-// 	return func(c echo.Context) error {
-// 		log.Println("server MESSAGE")
-// 		return next(c)
-// 	}
-// }
 
 func serMes(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
